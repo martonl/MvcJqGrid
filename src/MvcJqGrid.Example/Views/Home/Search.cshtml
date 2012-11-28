@@ -12,26 +12,70 @@
 </section>
 }
 
-@(Html.Grid("search")
-    .SetCaption("Toolbar Search")
-    .AddColumn(new Column("CustomerId")
-        .SetLabel("Id"))
-    .AddColumn(new Column("Name"))
-    .AddColumn(new Column("Company")
-        .SetSearchType(Searchtype.Select)
-        .SetSearchTerms((string[])ViewData["CompanyNames"]))
-    .AddColumn(new Column("EmailAddress"))
-    .AddColumn(new Column("Last Modified")
-        .SetSearchType(Searchtype.Datepicker))
-    .AddColumn(new Column("Telephone"))
-    .SetUrl(Url.Action("GridDataBasic"))
-    .SetAutoWidth(true)
-    .SetRowNum(10)
-    .SetRowList(new[] { 10, 15, 20, 50 })
-    .SetViewRecords(true)
-    .SetPager("pager")
-    .SetSearchToolbar(true)
-    .SetSearchOnEnter(false))
+<table id="grid1"></table>
+<div id="grid1pager"></div>
+
+<script>
+    $(function () {
+    
+        var lastsel;
+
+        $("#grid1").jqGrid({
+            url: '@Url.Action("GridDataBasicGeneric")',
+            datatype: "json",
+            mtype: 'GET',
+            colNames: ['Id', 'Name', 'Company', 'Email Address', 'Last Modified', 'Telephone'],
+            colModel: [
+                      { name: 'CustomerId', index: 'CustomerId', width: 100 },
+                      { name: 'Name', index: 'Name', width: 100 },
+                      { name: 'Company', index: 'Company', width: 100 },
+                      { name: 'EmailAddress', index: 'EmailAddress', width: 100 },
+                      { name: 'LastModified', index: 'LastModified', width: 100, formatter: 'date', formatoptions: { srcformat: 'ISO8601Long', newformat: 'Y.m.d' } },
+                      { name: 'Telephone', index: 'Telephone', width: 100 }
+            ],
+            jsonReader: {
+                repeatitems: false
+            },
+            rowNum: 10,
+            rowList: [10, 25, 50],
+            pager: '#grid1pager',
+            sortname: 'Name',
+            viewrecords: true,
+            sortorder: "asc",
+            caption: "My first jqgrid",
+            onSelectRow: function (id) {
+                if (id && id !== lastsel) {
+                    $('#grid1').jqGrid('restoreRow', lastsel);
+                    $('#grid1').jqGrid('editRow', id, true);
+                    lastsel = id;
+                }
+            },
+            editurl: "/Home/SaveGrid"
+            //cellEdit: true,
+            //cellsubmit: 'remote', //'clientArray',
+            //cellurl: '/Home/GetGrid1Cont'
+            /*afterSaveCell: function (rowid, name, val, iRow, iCol) {
+                if (name == 'amount') {
+                    var taxval = jQuery("#celltbl").jqGrid('getCell', rowid, iCol + 1);
+                    jQuery("#celltbl").jqGrid('setRowData', rowid, { total: parseFloat(val) + parseFloat(taxval) });
+                }
+                if (name == 'tax') {
+                    var amtval = jQuery("#celltbl").jqGrid('getCell', rowid, iCol - 1);
+                    jQuery("#celltbl").jqGrid('setRowData', rowid, { total: parseFloat(val) + parseFloat(amtval) });
+                }
+            }*/
+            //editurl: "/jqGridModel?model=Wine"
+        });
+        $('#grid1').jqGrid('navGrid', '#grid1pager',
+            { edit: false, add: false, del: false },
+            {},
+            {},
+            {},
+            { multipleSearch: true, multipleGroup: true }
+        );
+        $("#grid1").jqGrid('filterToolbar', { stringResult: true, searchOnEnter: false });
+    });
+</script>
 
 <h3>Source:</h3>
 

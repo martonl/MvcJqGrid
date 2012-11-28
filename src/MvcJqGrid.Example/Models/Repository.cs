@@ -18,6 +18,31 @@ namespace MvcJqGrid.Example.Models
             return customers.Count();
         }
 
+        public class CustomerViewModel
+        {
+            public int CustomerId { get; set; }
+            public string Name { get; set; }
+            public string Company { get; set; }
+            public string EmailAddress { get; set; }
+            public DateTime LastModified { get; set; }
+            public string Telephone { get; set; }
+        }
+
+        public IQueryable<CustomerViewModel> GetCustomersGeneric()
+        {
+            var result = from c in _dataContext.Customers
+                         select new CustomerViewModel
+                         {
+                            CustomerId = c.CustomerID,
+                            Name = String.Concat(c.FirstName, c.LastName),
+                            Company = c.CompanyName,
+                            EmailAddress = c.EmailAddress,
+                            LastModified = c.ModifiedDate,
+                            Telephone = c.Phone
+                         };
+            return result;
+        }
+
         public IQueryable<Customer> GetCustomers(GridSettings gridSettings)
         {
             var customers = orderCustomers(_dataContext.Customers.AsQueryable(), gridSettings.SortColumn, gridSettings.SortOrder);
